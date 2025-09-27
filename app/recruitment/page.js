@@ -1,867 +1,16 @@
-// "use client"
-
-// import { useState, useEffect } from "react"
-// import Layout from "../../components/Layout"
-// import { applicationService, employeeService } from "../../lib/services"
-
-// // Icons
-// const CalendarDaysIcon = ({ className }) => (
-//     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-//         <path
-//             strokeLinecap="round"
-//             strokeLinejoin="round"
-//             d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5a2.25 2.25 0 002.25-2.25m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5a2.25 2.25 0 012.25 2.25v7.5"
-//         />
-//     </svg>
-// )
-
-// const ClipboardDocumentCheckIcon = ({ className }) => (
-//     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-//         <path
-//             strokeLinecap="round"
-//             strokeLinejoin="round"
-//             d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.25-4.875c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0117.25 18.75h-10.5A2.25 2.25 0 014.5 16.5V6.108c0-1.135.845-2.098 1.976-2.192.373-.03.748-.057 1.124-.08M15 12.75a3 3 0 11-6 0 3 3 0 016 0zm-3 2.25a.75.75 0 100-1.5.75.75 0 000 1.5z"
-//         />
-//     </svg>
-// )
-
-// const PlusIcon = ({ className }) => (
-//     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-//         <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-//     </svg>
-// )
-
-// const PencilIcon = ({ className }) => (
-//     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-//         <path
-//             strokeLinecap="round"
-//             strokeLinejoin="round"
-//             d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-//         />
-//     </svg>
-// )
-
-// const CheckIcon = ({ className }) => (
-//     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-//         <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-//     </svg>
-// )
-
-// const XMarkIcon = ({ className }) => (
-//     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-//         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-//     </svg>
-// )
-
-// export default function Recruitment() {
-//     const [activeTab, setActiveTab] = useState("interviews")
-//     const [interviews, setInterviews] = useState([])
-//     const [referenceChecks, setReferenceChecks] = useState([])
-//     const [applications, setApplications] = useState([])
-//     const [employees, setEmployees] = useState([])
-//     const [loading, setLoading] = useState(true)
-//     const [showModal, setShowModal] = useState(false)
-//     const [modalType, setModalType] = useState("interview")
-//     const [editingItem, setEditingItem] = useState(null)
-//     const [error, setError] = useState("")
-//     const [submitting, setSubmitting] = useState(false)
-
-//     // Form data states
-//     const [interviewFormData, setInterviewFormData] = useState({
-//         application: "",
-//         interviewer: "",
-//         interview_type: "phone",
-//         scheduled_date: "",
-//         scheduled_time: "",
-//         duration_minutes: 60,
-//         location: "",
-//         notes: "",
-//         status: "scheduled",
-//     })
-
-//     const [referenceFormData, setReferenceFormData] = useState({
-//         application: "",
-//         reference_name: "",
-//         reference_email: "",
-//         reference_phone: "",
-//         relationship: "",
-//         company: "",
-//         position: "",
-//         contacted_date: "",
-//         response_received: false,
-//         rating: 5,
-//         comments: "",
-//         status: "pending",
-//     })
-
-//     useEffect(() => {
-//         fetchData()
-//     }, [])
-
-//     const fetchData = async () => {
-//         try {
-//             setLoading(true)
-//             setError("")
-
-//             const [applicationsData, employeesData] = await Promise.all([
-//                 applicationService.getApplications(),
-//                 employeeService.getEmployees(),
-//             ])
-
-//             setApplications(applicationsData)
-//             setEmployees(employeesData)
-
-//             // Mock data for interviews and reference checks
-//             setInterviews([
-//                 {
-//                     id: 1,
-//                     application: {
-//                         id: 1,
-//                         candidate_name: "John Smith",
-//                         job_posting: { title: "Senior Software Engineer" },
-//                     },
-//                     interviewer: { first_name: "Jane", last_name: "Doe" },
-//                     interview_type: "video",
-//                     scheduled_date: "2025-01-25",
-//                     scheduled_time: "14:00",
-//                     duration_minutes: 60,
-//                     location: "Zoom Meeting",
-//                     status: "scheduled",
-//                     notes: "Technical interview focusing on React and Node.js",
-//                 },
-//                 {
-//                     id: 2,
-//                     application: {
-//                         id: 2,
-//                         candidate_name: "Sarah Johnson",
-//                         job_posting: { title: "Marketing Manager" },
-//                     },
-//                     interviewer: { first_name: "Mike", last_name: "Wilson" },
-//                     interview_type: "in_person",
-//                     scheduled_date: "2025-01-24",
-//                     scheduled_time: "10:30",
-//                     duration_minutes: 45,
-//                     location: "Conference Room A",
-//                     status: "completed",
-//                     notes: "Great cultural fit, strong marketing background",
-//                 },
-//             ])
-
-//             setReferenceChecks([
-//                 {
-//                     id: 1,
-//                     application: {
-//                         id: 1,
-//                         candidate_name: "John Smith",
-//                         job_posting: { title: "Senior Software Engineer" },
-//                     },
-//                     reference_name: "Alice Brown",
-//                     reference_email: "alice.brown@techcorp.com",
-//                     reference_phone: "+1-555-0123",
-//                     relationship: "Former Manager",
-//                     company: "TechCorp Inc.",
-//                     position: "Engineering Manager",
-//                     contacted_date: "2025-01-20",
-//                     response_received: true,
-//                     rating: 5,
-//                     comments: "Excellent developer, strong problem-solving skills",
-//                     status: "completed",
-//                 },
-//                 {
-//                     id: 2,
-//                     application: {
-//                         id: 2,
-//                         candidate_name: "Sarah Johnson",
-//                         job_posting: { title: "Marketing Manager" },
-//                     },
-//                     reference_name: "Bob Davis",
-//                     reference_email: "bob.davis@marketpro.com",
-//                     reference_phone: "+1-555-0456",
-//                     relationship: "Former Colleague",
-//                     company: "MarketPro Solutions",
-//                     position: "Senior Marketing Specialist",
-//                     contacted_date: "2025-01-22",
-//                     response_received: false,
-//                     rating: 0,
-//                     comments: "",
-//                     status: "pending",
-//                 },
-//             ])
-//         } catch (error) {
-//             console.error("Failed to fetch recruitment data:", error)
-//             setError("Failed to load recruitment data. Please try again.")
-//         } finally {
-//             setLoading(false)
-//         }
-//     }
-
-//     const handleCreateInterview = () => {
-//         setModalType("interview")
-//         setEditingItem(null)
-//         setInterviewFormData({
-//             application: "",
-//             interviewer: "",
-//             interview_type: "phone",
-//             scheduled_date: "",
-//             scheduled_time: "",
-//             duration_minutes: 60,
-//             location: "",
-//             notes: "",
-//             status: "scheduled",
-//         })
-//         setShowModal(true)
-//     }
-
-//     const handleCreateReferenceCheck = () => {
-//         setModalType("reference")
-//         setEditingItem(null)
-//         setReferenceFormData({
-//             application: "",
-//             reference_name: "",
-//             reference_email: "",
-//             reference_phone: "",
-//             relationship: "",
-//             company: "",
-//             position: "",
-//             contacted_date: "",
-//             response_received: false,
-//             rating: 5,
-//             comments: "",
-//             status: "pending",
-//         })
-//         setShowModal(true)
-//     }
-
-//     const handleSubmit = async (e) => {
-//         e.preventDefault()
-//         setSubmitting(true)
-//         setError("")
-
-//         try {
-//             // Here you would call the actual API endpoints
-//             // For now, we'll just simulate the API call
-//             await new Promise((resolve) => setTimeout(resolve, 1000))
-
-//             if (modalType === "interview") {
-//                 if (editingItem) {
-//                     // Update interview
-//                     const updatedInterviews = interviews.map((interview) =>
-//                         interview.id === editingItem.id ? { ...interview, ...interviewFormData } : interview,
-//                     )
-//                     setInterviews(updatedInterviews)
-//                 } else {
-//                     // Create new interview
-//                     const newInterview = {
-//                         id: Date.now(),
-//                         ...interviewFormData,
-//                         application: applications.find((app) => app.id === Number.parseInt(interviewFormData.application)),
-//                         interviewer: employees.find((emp) => emp.id === Number.parseInt(interviewFormData.interviewer)),
-//                     }
-//                     setInterviews([...interviews, newInterview])
-//                 }
-//             } else if (modalType === "reference") {
-//                 if (editingItem) {
-//                     // Update reference check
-//                     const updatedReferences = referenceChecks.map((ref) =>
-//                         ref.id === editingItem.id ? { ...ref, ...referenceFormData } : ref,
-//                     )
-//                     setReferenceChecks(updatedReferences)
-//                 } else {
-//                     // Create new reference check
-//                     const newReference = {
-//                         id: Date.now(),
-//                         ...referenceFormData,
-//                         application: applications.find((app) => app.id === Number.parseInt(referenceFormData.application)),
-//                     }
-//                     setReferenceChecks([...referenceChecks, newReference])
-//                 }
-//             }
-
-//             setShowModal(false)
-//             setEditingItem(null)
-//         } catch (error) {
-//             console.error("Failed to save:", error)
-//             setError("Failed to save. Please try again.")
-//         } finally {
-//             setSubmitting(false)
-//         }
-//     }
-
-//     const formatDate = (dateString) => {
-//         if (!dateString) return "N/A"
-//         return new Date(dateString).toLocaleDateString()
-//     }
-
-//     const formatDateTime = (date, time) => {
-//         if (!date || !time) return "N/A"
-//         return `${formatDate(date)} at ${time}`
-//     }
-
-//     const getStatusColor = (status) => {
-//         switch (status) {
-//             case "scheduled":
-//             case "pending":
-//                 return "bg-yellow-100 text-yellow-800"
-//             case "completed":
-//                 return "bg-green-100 text-green-800"
-//             case "cancelled":
-//                 return "bg-red-100 text-red-800"
-//             default:
-//                 return "bg-gray-100 text-gray-800"
-//         }
-//     }
-
-//     const renderStars = (rating) => {
-//         return Array.from({ length: 5 }, (_, i) => (
-//             <span key={i} className={`text-lg ${i < rating ? "text-yellow-400" : "text-gray-300"}`}>
-//                 ★
-//             </span>
-//         ))
-//     }
-
-//     if (loading) {
-//         return (
-//             <Layout>
-//                 <div className="p-6">
-//                     <div className="animate-pulse">
-//                         <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-//                         <div className="space-y-4">
-//                             {[...Array(3)].map((_, i) => (
-//                                 <div key={i} className="h-32 bg-gray-200 rounded"></div>
-//                             ))}
-//                         </div>
-//                     </div>
-//                 </div>
-//             </Layout>
-//         )
-//     }
-
-//     return (
-//         <Layout>
-//             <div className="p-6">
-//                 {/* Header */}
-//                 <div className="mb-8">
-//                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Recruitment Management</h1>
-//                     <p className="text-gray-600">Manage interviews and reference checks for candidates</p>
-//                 </div>
-
-//                 {/* Error Message */}
-//                 {error && (
-//                     <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
-//                         <div className="text-sm text-red-700">{error}</div>
-//                     </div>
-//                 )}
-
-//                 {/* Tabs */}
-//                 <div className="border-b border-gray-200 mb-6">
-//                     <nav className="-mb-px flex space-x-8">
-//                         <button
-//                             onClick={() => setActiveTab("interviews")}
-//                             className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === "interviews"
-//                                 ? "border-indigo-500 text-indigo-600"
-//                                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-//                                 }`}
-//                         >
-//                             Interviews
-//                         </button>
-//                         <button
-//                             onClick={() => setActiveTab("references")}
-//                             className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === "references"
-//                                 ? "border-indigo-500 text-indigo-600"
-//                                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-//                                 }`}
-//                         >
-//                             Reference Checks
-//                         </button>
-//                     </nav>
-//                 </div>
-
-//                 {/* Tab Content Header */}
-//                 <div className="flex items-center justify-between mb-6">
-//                     <h2 className="text-xl font-semibold text-gray-900">
-//                         {activeTab === "interviews" && "Interview Schedule"}
-//                         {activeTab === "references" && "Reference Checks"}
-//                     </h2>
-//                     <button
-//                         onClick={() => {
-//                             if (activeTab === "interviews") handleCreateInterview()
-//                             else if (activeTab === "references") handleCreateReferenceCheck()
-//                         }}
-//                         className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-//                     >
-//                         <PlusIcon className="h-5 w-5 mr-2" />
-//                         {activeTab === "interviews" && "Schedule Interview"}
-//                         {activeTab === "references" && "Add Reference Check"}
-//                     </button>
-//                 </div>
-
-//                 {/* Interviews Tab */}
-//                 {activeTab === "interviews" && (
-//                     <div className="space-y-4">
-//                         {interviews.length === 0 ? (
-//                             <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-//                                 <CalendarDaysIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-//                                 <div className="text-gray-500 mb-4">No interviews scheduled</div>
-//                                 <button
-//                                     onClick={handleCreateInterview}
-//                                     className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-//                                 >
-//                                     <PlusIcon className="h-5 w-5 mr-2" />
-//                                     Schedule First Interview
-//                                 </button>
-//                             </div>
-//                         ) : (
-//                             interviews.map((interview) => (
-//                                 <div
-//                                     key={interview.id}
-//                                     className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow"
-//                                 >
-//                                     <div className="flex justify-between items-start mb-4">
-//                                         <div className="flex-1">
-//                                             <div className="flex items-center gap-3 mb-2">
-//                                                 <h3 className="text-lg font-semibold text-gray-900">
-//                                                     {interview.application?.candidate_name} - {interview.application?.job_posting?.title}
-//                                                 </h3>
-//                                                 <span
-//                                                     className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(interview.status)}`}
-//                                                 >
-//                                                     {interview.status}
-//                                                 </span>
-//                                                 <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-//                                                     {interview.interview_type}
-//                                                 </span>
-//                                             </div>
-//                                             <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-//                                                 <div>
-//                                                     Interviewer: {interview.interviewer?.first_name} {interview.interviewer?.last_name}
-//                                                 </div>
-//                                                 <div>Date: {formatDateTime(interview.scheduled_date, interview.scheduled_time)}</div>
-//                                                 <div>Duration: {interview.duration_minutes} min</div>
-//                                             </div>
-//                                             <div className="text-sm text-gray-600 mb-2">Location: {interview.location || "N/A"}</div>
-//                                             <p className="text-gray-700 text-sm">{interview.notes}</p>
-//                                         </div>
-//                                         <div className="flex items-center gap-2 ml-4">
-//                                             <button className="inline-flex items-center px-3 py-1 text-sm text-gray-600 hover:text-gray-900">
-//                                                 <PencilIcon className="h-4 w-4 mr-1" />
-//                                                 Edit
-//                                             </button>
-//                                             {interview.status === "scheduled" && (
-//                                                 <>
-//                                                     <button className="inline-flex items-center px-3 py-1 text-sm bg-green-600 text-white rounded-md hover:bg-green-700">
-//                                                         <CheckIcon className="h-4 w-4 mr-1" />
-//                                                         Complete
-//                                                     </button>
-//                                                     <button className="inline-flex items-center px-3 py-1 text-sm bg-red-600 text-white rounded-md hover:bg-red-700">
-//                                                         <XMarkIcon className="h-4 w-4 mr-1" />
-//                                                         Cancel
-//                                                     </button>
-//                                                 </>
-//                                             )}
-//                                         </div>
-//                                     </div>
-//                                 </div>
-//                             ))
-//                         )}
-//                     </div>
-//                 )}
-
-//                 {/* Reference Checks Tab */}
-//                 {activeTab === "references" && (
-//                     <div className="space-y-4">
-//                         {referenceChecks.length === 0 ? (
-//                             <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-//                                 <ClipboardDocumentCheckIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-//                                 <div className="text-gray-500 mb-4">No reference checks found</div>
-//                                 <button
-//                                     onClick={handleCreateReferenceCheck}
-//                                     className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-//                                 >
-//                                     <PlusIcon className="h-5 w-5 mr-2" />
-//                                     Add First Reference Check
-//                                 </button>
-//                             </div>
-//                         ) : (
-//                             referenceChecks.map((reference) => (
-//                                 <div
-//                                     key={reference.id}
-//                                     className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow"
-//                                 >
-//                                     <div className="flex justify-between items-start mb-4">
-//                                         <div className="flex-1">
-//                                             <div className="flex items-center gap-3 mb-2">
-//                                                 <h3 className="text-lg font-semibold text-gray-900">
-//                                                     {reference.application?.candidate_name} - {reference.application?.job_posting?.title}
-//                                                 </h3>
-//                                                 <span
-//                                                     className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(reference.status)}`}
-//                                                 >
-//                                                     {reference.status}
-//                                                 </span>
-//                                             </div>
-//                                             <div className="grid grid-cols-2 gap-4 text-sm text-gray-600 mb-3">
-//                                                 <div>
-//                                                     <div className="font-medium">Reference: {reference.reference_name}</div>
-//                                                     <div>
-//                                                         {reference.relationship} at {reference.company}
-//                                                     </div>
-//                                                     <div>{reference.position}</div>
-//                                                 </div>
-//                                                 <div>
-//                                                     <div>Email: {reference.reference_email}</div>
-//                                                     <div>Phone: {reference.reference_phone}</div>
-//                                                     <div>Contacted: {formatDate(reference.contacted_date)}</div>
-//                                                 </div>
-//                                             </div>
-//                                             {reference.response_received && (
-//                                                 <div className="mb-3">
-//                                                     <div className="flex items-center gap-2 mb-2">
-//                                                         <span className="text-sm font-medium text-gray-700">Rating:</span>
-//                                                         <div className="flex">{renderStars(reference.rating)}</div>
-//                                                         <span className="text-sm text-gray-600">({reference.rating}/5)</span>
-//                                                     </div>
-//                                                     <p className="text-gray-700 text-sm">{reference.comments}</p>
-//                                                 </div>
-//                                             )}
-//                                         </div>
-//                                         <div className="flex items-center gap-2 ml-4">
-//                                             <button className="inline-flex items-center px-3 py-1 text-sm text-gray-600 hover:text-gray-900">
-//                                                 <PencilIcon className="h-4 w-4 mr-1" />
-//                                                 Edit
-//                                             </button>
-//                                             {!reference.response_received && (
-//                                                 <button className="inline-flex items-center px-3 py-1 text-sm bg-green-600 text-white rounded-md hover:bg-green-700">
-//                                                     <CheckIcon className="h-4 w-4 mr-1" />
-//                                                     Mark Complete
-//                                                 </button>
-//                                             )}
-//                                         </div>
-//                                     </div>
-//                                 </div>
-//                             ))
-//                         )}
-//                     </div>
-//                 )}
-
-//                 {/* Modal for Creating/Editing */}
-//                 {showModal && (
-//                     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-//                         <div className="relative top-10 mx-auto p-6 border w-full max-w-2xl shadow-lg rounded-md bg-white">
-//                             <div className="mb-4">
-//                                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
-//                                     {editingItem ? "Edit" : "Create"} {modalType === "interview" ? "Interview" : "Reference Check"}
-//                                 </h3>
-//                             </div>
-
-//                             <form onSubmit={handleSubmit} className="space-y-6">
-//                                 {/* Interview Form */}
-//                                 {modalType === "interview" && (
-//                                     <>
-//                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//                                             <div>
-//                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Application *</label>
-//                                                 <select
-//                                                     required
-//                                                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-//                                                     value={interviewFormData.application}
-//                                                     onChange={(e) => setInterviewFormData({ ...interviewFormData, application: e.target.value })}
-//                                                 >
-//                                                     <option value="">Select Application</option>
-//                                                     {applications.map((app) => (
-//                                                         <option key={app.id} value={app.id}>
-//                                                             {app.candidate_name} - {app.job_posting?.title}
-//                                                         </option>
-//                                                     ))}
-//                                                 </select>
-//                                             </div>
-//                                             <div>
-//                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Interviewer *</label>
-//                                                 <select
-//                                                     required
-//                                                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-//                                                     value={interviewFormData.interviewer}
-//                                                     onChange={(e) => setInterviewFormData({ ...interviewFormData, interviewer: e.target.value })}
-//                                                 >
-//                                                     <option value="">Select Interviewer</option>
-//                                                     {employees.map((emp) => (
-//                                                         <option key={emp.id} value={emp.id}>
-//                                                             {emp.first_name} {emp.last_name}
-//                                                         </option>
-//                                                     ))}
-//                                                 </select>
-//                                             </div>
-//                                         </div>
-//                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-//                                             <div>
-//                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Interview Type</label>
-//                                                 <select
-//                                                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-//                                                     value={interviewFormData.interview_type}
-//                                                     onChange={(e) =>
-//                                                         setInterviewFormData({ ...interviewFormData, interview_type: e.target.value })
-//                                                     }
-//                                                 >
-//                                                     <option value="phone">Phone</option>
-//                                                     <option value="video">Video Call</option>
-//                                                     <option value="in_person">In Person</option>
-//                                                 </select>
-//                                             </div>
-//                                             <div>
-//                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Date *</label>
-//                                                 <input
-//                                                     type="date"
-//                                                     required
-//                                                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-//                                                     value={interviewFormData.scheduled_date}
-//                                                     onChange={(e) =>
-//                                                         setInterviewFormData({ ...interviewFormData, scheduled_date: e.target.value })
-//                                                     }
-//                                                 />
-//                                             </div>
-//                                             <div>
-//                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Time *</label>
-//                                                 <input
-//                                                     type="time"
-//                                                     required
-//                                                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-//                                                     value={interviewFormData.scheduled_time}
-//                                                     onChange={(e) =>
-//                                                         setInterviewFormData({ ...interviewFormData, scheduled_time: e.target.value })
-//                                                     }
-//                                                 />
-//                                             </div>
-//                                         </div>
-//                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//                                             <div>
-//                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Duration (minutes)</label>
-//                                                 <input
-//                                                     type="number"
-//                                                     min="15"
-//                                                     max="240"
-//                                                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-//                                                     value={interviewFormData.duration_minutes}
-//                                                     onChange={(e) =>
-//                                                         setInterviewFormData({
-//                                                             ...interviewFormData,
-//                                                             duration_minutes: Number.parseInt(e.target.value),
-//                                                         })
-//                                                     }
-//                                                 />
-//                                             </div>
-//                                             <div>
-//                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
-//                                                 <input
-//                                                     type="text"
-//                                                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-//                                                     value={interviewFormData.location}
-//                                                     onChange={(e) => setInterviewFormData({ ...interviewFormData, location: e.target.value })}
-//                                                     placeholder="Conference Room A, Zoom link, etc."
-//                                                 />
-//                                             </div>
-//                                         </div>
-//                                         <div>
-//                                             <label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
-//                                             <textarea
-//                                                 rows={3}
-//                                                 className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-//                                                 value={interviewFormData.notes}
-//                                                 onChange={(e) => setInterviewFormData({ ...interviewFormData, notes: e.target.value })}
-//                                                 placeholder="Interview agenda, focus areas, etc."
-//                                             />
-//                                         </div>
-//                                     </>
-//                                 )}
-
-//                                 {/* Reference Check Form */}
-//                                 {modalType === "reference" && (
-//                                     <>
-//                                         <div>
-//                                             <label className="block text-sm font-medium text-gray-700 mb-2">Application *</label>
-//                                             <select
-//                                                 required
-//                                                 className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-//                                                 value={referenceFormData.application}
-//                                                 onChange={(e) => setReferenceFormData({ ...referenceFormData, application: e.target.value })}
-//                                             >
-//                                                 <option value="">Select Application</option>
-//                                                 {applications.map((app) => (
-//                                                     <option key={app.id} value={app.id}>
-//                                                         {app.candidate_name} - {app.job_posting?.title}
-//                                                     </option>
-//                                                 ))}
-//                                             </select>
-//                                         </div>
-//                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//                                             <div>
-//                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Reference Name *</label>
-//                                                 <input
-//                                                     type="text"
-//                                                     required
-//                                                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-//                                                     value={referenceFormData.reference_name}
-//                                                     onChange={(e) =>
-//                                                         setReferenceFormData({ ...referenceFormData, reference_name: e.target.value })
-//                                                     }
-//                                                     placeholder="John Doe"
-//                                                 />
-//                                             </div>
-//                                             <div>
-//                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Relationship *</label>
-//                                                 <select
-//                                                     required
-//                                                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-//                                                     value={referenceFormData.relationship}
-//                                                     onChange={(e) => setReferenceFormData({ ...referenceFormData, relationship: e.target.value })}
-//                                                 >
-//                                                     <option value="">Select Relationship</option>
-//                                                     <option value="Former Manager">Former Manager</option>
-//                                                     <option value="Former Colleague">Former Colleague</option>
-//                                                     <option value="Direct Report">Direct Report</option>
-//                                                     <option value="Client">Client</option>
-//                                                     <option value="Other">Other</option>
-//                                                 </select>
-//                                             </div>
-//                                         </div>
-//                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//                                             <div>
-//                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
-//                                                 <input
-//                                                     type="email"
-//                                                     required
-//                                                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-//                                                     value={referenceFormData.reference_email}
-//                                                     onChange={(e) =>
-//                                                         setReferenceFormData({ ...referenceFormData, reference_email: e.target.value })
-//                                                     }
-//                                                     placeholder="john.doe@company.com"
-//                                                 />
-//                                             </div>
-//                                             <div>
-//                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-//                                                 <input
-//                                                     type="tel"
-//                                                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-//                                                     value={referenceFormData.reference_phone}
-//                                                     onChange={(e) =>
-//                                                         setReferenceFormData({ ...referenceFormData, reference_phone: e.target.value })
-//                                                     }
-//                                                     placeholder="+1-555-0123"
-//                                                 />
-//                                             </div>
-//                                         </div>
-//                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//                                             <div>
-//                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Company</label>
-//                                                 <input
-//                                                     type="text"
-//                                                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-//                                                     value={referenceFormData.company}
-//                                                     onChange={(e) => setReferenceFormData({ ...referenceFormData, company: e.target.value })}
-//                                                     placeholder="Company Name"
-//                                                 />
-//                                             </div>
-//                                             <div>
-//                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Position</label>
-//                                                 <input
-//                                                     type="text"
-//                                                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-//                                                     value={referenceFormData.position}
-//                                                     onChange={(e) => setReferenceFormData({ ...referenceFormData, position: e.target.value })}
-//                                                     placeholder="Job Title"
-//                                                 />
-//                                             </div>
-//                                         </div>
-//                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//                                             <div>
-//                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Contacted Date</label>
-//                                                 <input
-//                                                     type="date"
-//                                                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-//                                                     value={referenceFormData.contacted_date}
-//                                                     onChange={(e) =>
-//                                                         setReferenceFormData({ ...referenceFormData, contacted_date: e.target.value })
-//                                                     }
-//                                                 />
-//                                             </div>
-//                                             <div>
-//                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Rating (if received)</label>
-//                                                 <select
-//                                                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-//                                                     value={referenceFormData.rating}
-//                                                     onChange={(e) =>
-//                                                         setReferenceFormData({ ...referenceFormData, rating: Number.parseInt(e.target.value) })
-//                                                     }
-//                                                 >
-//                                                     <option value={1}>1 - Poor</option>
-//                                                     <option value={2}>2 - Below Average</option>
-//                                                     <option value={3}>3 - Average</option>
-//                                                     <option value={4}>4 - Good</option>
-//                                                     <option value={5}>5 - Excellent</option>
-//                                                 </select>
-//                                             </div>
-//                                         </div>
-//                                         <div>
-//                                             <label className="block text-sm font-medium text-gray-700 mb-2">Comments</label>
-//                                             <textarea
-//                                                 rows={3}
-//                                                 className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-//                                                 value={referenceFormData.comments}
-//                                                 onChange={(e) => setReferenceFormData({ ...referenceFormData, comments: e.target.value })}
-//                                                 placeholder="Reference feedback and comments..."
-//                                             />
-//                                         </div>
-//                                         <div className="flex items-center">
-//                                             <input
-//                                                 type="checkbox"
-//                                                 id="response_received"
-//                                                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-//                                                 checked={referenceFormData.response_received}
-//                                                 onChange={(e) =>
-//                                                     setReferenceFormData({ ...referenceFormData, response_received: e.target.checked })
-//                                                 }
-//                                             />
-//                                             <label htmlFor="response_received" className="ml-2 block text-sm text-gray-900">
-//                                                 Response received from reference
-//                                             </label>
-//                                         </div>
-//                                     </>
-//                                 )}
-
-//                                 <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
-//                                     <button
-//                                         type="button"
-//                                         onClick={() => {
-//                                             setShowModal(false)
-//                                             setEditingItem(null)
-//                                         }}
-//                                         className="px-6 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-//                                         disabled={submitting}
-//                                     >
-//                                         Cancel
-//                                     </button>
-//                                     <button
-//                                         type="submit"
-//                                         className="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
-//                                         disabled={submitting}
-//                                     >
-//                                         {submitting ? "Saving..." : editingItem ? "Update" : "Create"}
-//                                     </button>
-//                                 </div>
-//                             </form>
-//                         </div>
-//                     </div>
-//                 )}
-//             </div>
-//         </Layout>
-//     )
-// }
-
-
 "use client"
 
 import { useState, useEffect } from "react"
 import Layout from "../../components/Layout"
-import { applicationService, jobPostingService, employeeService } from "../../lib/services"
+import Pagination from "../../components/Pagination"
+import {
+    applicationService,
+    jobPostingService,
+    employeeService,
+    interviewService,
+    referenceCheckService,
+    managerService
+} from "../../lib/services"
 import {
     PlusIcon,
     PencilIcon,
@@ -871,132 +20,112 @@ import {
     CalendarIcon,
     PhoneIcon,
     CheckCircleIcon,
+    XMarkIcon,
+    ExclamationTriangleIcon
 } from "@heroicons/react/24/outline"
 
 export default function Recruitment() {
     const [activeTab, setActiveTab] = useState("overview")
     const [interviews, setInterviews] = useState([])
     const [referenceChecks, setReferenceChecks] = useState([])
+    const [managers, setManagers] = useState([])
+    const [completedTechnicalInterviews, setCompletedTechnicalInterviews] = useState([])
     const [applications, setApplications] = useState([])
     const [jobPostings, setJobPostings] = useState([])
+    const [finalLists, setFinalList] = useState([])
     const [employees, setEmployees] = useState([])
     const [loading, setLoading] = useState(true)
     const [showModal, setShowModal] = useState(false)
     const [modalType, setModalType] = useState("interview") // interview, reference
     const [editingItem, setEditingItem] = useState(null)
     const [searchTerm, setSearchTerm] = useState("")
+    const [showDeleteModal, setShowDeleteModal] = useState(false)
+    const [itemToDelete, setItemToDelete] = useState(null)
+    const [deleteType, setDeleteType] = useState("")
+
+    const [interviewsPage, setInterviewsPage] = useState(1)
+    const [interviewsTotalPages, setInterviewsTotalPages] = useState(0)
+    const [interviewsTotalItems, setInterviewsTotalItems] = useState(0)
+    const [referencesPage, setReferencesPage] = useState(1)
+    const [referencesTotalPages, setReferencesTotalPages] = useState(0)
+    const [referencesTotalItems, setReferencesTotalItems] = useState(0)
+    const interviewsPerPage = 5
+    const referencesPerPage = 5
 
     // Form states
     const [interviewForm, setInterviewForm] = useState({
         application: "",
-        interviewer: "",
         interview_type: "phone",
         scheduled_date: "",
-        scheduled_time: "",
-        duration: 60,
+        duration_minutes: 60,
+        interviewer: "",
         location: "",
         notes: "",
-        status: "scheduled",
         rating: "",
+        status: "scheduled",
         feedback: "",
+        recommendation: "Maybe",
+        manager: "",
+        questions_asked: ["What is the purpose of joining our company?"],
+        technical_assessment: {
+            "technical_assessment": "Are you ready for assessment?"
+        },
     })
 
     const [referenceForm, setReferenceForm] = useState({
         application: "",
         reference_name: "",
+        reference_title: "",
+        reference_company: "",
         reference_email: "",
         reference_phone: "",
         relationship: "",
-        company: "",
-        position: "",
-        contacted_date: "",
-        response_date: "",
         status: "pending",
-        rating: "",
-        comments: "",
-        would_rehire: null,
+        contacted_date: "",
+        completed_date: "",
+        feedback: "",
+        would_rehire: true,
+        performance_rating: "",
+        conducted_by: "",
     })
 
     useEffect(() => {
         fetchData()
     }, [])
 
+    useEffect(() => {
+        if (activeTab === "interviews") {
+            fetchInterviews()
+        }
+    }, [interviewsPage, activeTab])
+
+    useEffect(() => {
+        if (activeTab === "references") {
+            fetchReferenceChecks()
+        }
+    }, [referencesPage, activeTab])
+
     const fetchData = async () => {
         try {
-            const [applicationsData, jobPostingsData, employeesData] = await Promise.all([
-                applicationService.getApplications(),
-                jobPostingService.getJobPostings(),
+            const [applicationsData, jobPostingsData, employeesData, managersData, finalListData] = await Promise.all([
+                applicationService.getApplications(null, null, 1, 100),
+                jobPostingService.getJobPostings(1, 100),
                 employeeService.getEmployees(1, 100),
+                managerService.getManagers(1, 100),
+                interviewService.getFinalList("completed", "technical")
             ])
 
-            setApplications(applicationsData)
-            setJobPostings(jobPostingsData)
+            setApplications(applicationsData.results || applicationsData)
+            setJobPostings(jobPostingsData.results || jobPostingsData)
             setEmployees(employeesData.results || employeesData)
+            setManagers(managersData)
+            setFinalList(finalListData)
 
-            // Mock data for interviews and reference checks
-            setInterviews([
-                {
-                    id: 1,
-                    application: { id: 1, candidate_name: "John Smith", job_posting: { title: "Senior Software Engineer" } },
-                    interviewer: { first_name: "Sarah", last_name: "Johnson" },
-                    interview_type: "technical",
-                    scheduled_date: "2025-01-25",
-                    scheduled_time: "14:00",
-                    duration: 90,
-                    location: "Conference Room A",
-                    status: "scheduled",
-                    rating: null,
-                    feedback: "",
-                },
-                {
-                    id: 2,
-                    application: { id: 2, candidate_name: "Emily Chen", job_posting: { title: "Marketing Manager" } },
-                    interviewer: { first_name: "Mike", last_name: "Davis" },
-                    interview_type: "behavioral",
-                    scheduled_date: "2025-01-24",
-                    scheduled_time: "10:30",
-                    duration: 60,
-                    location: "Video Call",
-                    status: "completed",
-                    rating: 4,
-                    feedback: "Strong communication skills, good cultural fit",
-                },
-            ])
+            await fetchCompletedTechnicalInterviews()
 
-            setReferenceChecks([
-                {
-                    id: 1,
-                    application: { id: 1, candidate_name: "John Smith", job_posting: { title: "Senior Software Engineer" } },
-                    reference_name: "David Wilson",
-                    reference_email: "david.wilson@techcorp.com",
-                    reference_phone: "+1-555-0123",
-                    relationship: "Former Manager",
-                    company: "TechCorp Inc.",
-                    position: "Engineering Director",
-                    contacted_date: "2025-01-20",
-                    response_date: "2025-01-22",
-                    status: "completed",
-                    rating: 5,
-                    comments: "Excellent developer, highly recommended",
-                    would_rehire: true,
-                },
-                {
-                    id: 2,
-                    application: { id: 2, candidate_name: "Emily Chen", job_posting: { title: "Marketing Manager" } },
-                    reference_name: "Lisa Brown",
-                    reference_email: "lisa.brown@marketpro.com",
-                    reference_phone: "+1-555-0456",
-                    relationship: "Former Colleague",
-                    company: "MarketPro Solutions",
-                    position: "Senior Marketing Specialist",
-                    contacted_date: "2025-01-21",
-                    response_date: null,
-                    status: "pending",
-                    rating: null,
-                    comments: "",
-                    would_rehire: null,
-                },
-            ])
+            // Fetch initial data for interviews and references
+            await fetchInterviews()
+            await fetchReferenceChecks()
         } catch (error) {
             console.error("Failed to fetch recruitment data:", error)
         } finally {
@@ -1004,83 +133,163 @@ export default function Recruitment() {
         }
     }
 
+    const fetchCompletedTechnicalInterviews = async () => {
+        try {
+            const completedInterviews = await interviewService.getFinalList("completed", "technical")
+            setCompletedTechnicalInterviews(completedInterviews)
+        } catch (error) {
+            console.error("Failed to fetch completed technical interviews:", error)
+            setCompletedTechnicalInterviews([])
+        }
+    }
+    const fetchInterviews = async () => {
+        try {
+            const interviewsData = await interviewService.getInterviews(interviewsPage, interviewsPerPage)
+            setInterviews(interviewsData.results)
+            setInterviewsTotalPages(interviewsData.total_pages)
+            setInterviewsTotalItems(interviewsData.count)
+        } catch (error) {
+            console.error("Failed to fetch interviews:", error)
+        }
+    }
+
+    const fetchReferenceChecks = async () => {
+        try {
+            const referenceChecksData = await referenceCheckService.getReferenceChecks(referencesPage, referencesPerPage)
+            setReferenceChecks(referenceChecksData.results)
+            setReferencesTotalPages(referenceChecksData.total_pages)
+            setReferencesTotalItems(referenceChecksData.count)
+        } catch (error) {
+            console.error("Failed to fetch reference checks:", error)
+        }
+    }
+
+    const refreshApplicationsData = async () => {
+        try {
+            const applicationsData = await applicationService.getApplications(null, null, 1, 100)
+            setApplications(applicationsData.results || applicationsData)
+        } catch (error) {
+            console.error("Failed to refresh applications data:", error)
+        }
+    }
+
+    const handleInterviewsPageChange = (page) => {
+        setInterviewsPage(page)
+    }
+
+    const handleReferencesPageChange = (page) => {
+        setReferencesPage(page)
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault()
 
         try {
-            // Mock API calls - replace with actual service calls
             if (modalType === "interview") {
+                const interviewData = {
+                    ...interviewForm,
+                    application: Number.parseInt(interviewForm.application),
+                    interviewer: Number.parseInt(interviewForm.interviewer),
+                    manager: interviewForm.manager ? Number.parseInt(interviewForm.manager) : null,
+                    duration_minutes: Number.parseInt(interviewForm.duration_minutes),
+                    rating: interviewForm.rating ? Number.parseInt(interviewForm.rating) : null,
+                }
+
                 if (editingItem) {
-                    // Update interview
-                    const updatedInterviews = interviews.map((interview) =>
-                        interview.id === editingItem.id ? { ...interview, ...interviewForm } : interview,
-                    )
-                    setInterviews(updatedInterviews)
+                    await interviewService.updateInterview(editingItem.id, interviewData)
                 } else {
-                    // Create interview
-                    const newInterview = {
-                        id: Date.now(),
-                        ...interviewForm,
-                        application: applications.find((app) => app.id === Number.parseInt(interviewForm.application)),
-                        interviewer: employees.find((emp) => emp.id === Number.parseInt(interviewForm.interviewer)),
-                    }
-                    setInterviews([...interviews, newInterview])
+                    await interviewService.createInterview(interviewData)
+                }
+                await fetchInterviews()
+
+                if (
+                    (interviewForm.status === "completed" && interviewForm.interview_type === "technical") ||
+                    (editingItem &&
+                        editingItem.status !== "completed" &&
+                        interviewForm.status === "completed" &&
+                        interviewForm.interview_type === "technical")
+                ) {
+                    await fetchCompletedTechnicalInterviews()
+                    await refreshApplicationsData()
                 }
             } else if (modalType === "reference") {
-                if (editingItem) {
-                    // Update reference check
-                    const updatedReferences = referenceChecks.map((ref) =>
-                        ref.id === editingItem.id ? { ...ref, ...referenceForm } : ref,
-                    )
-                    setReferenceChecks(updatedReferences)
-                } else {
-                    // Create reference check
-                    const newReference = {
-                        id: Date.now(),
-                        ...referenceForm,
-                        application: applications.find((app) => app.id === Number.parseInt(referenceForm.application)),
-                    }
-                    setReferenceChecks([...referenceChecks, newReference])
+                const referenceData = {
+                    application: Number(referenceForm.application),
+                    reference_name: referenceForm.reference_name?.trim(),
+                    reference_title: referenceForm.reference_title || null,
+                    reference_company: referenceForm.reference_company || null,
+                    reference_email: referenceForm.reference_email?.trim(),
+                    reference_phone: referenceForm.reference_phone || null,
+                    relationship: referenceForm.relationship,
+                    status: referenceForm.status,
+                    contacted_date: referenceForm.contacted_date || null,
+                    completed_date: referenceForm.completed_date || null,
+                    feedback: referenceForm.feedback || "",
+                    would_rehire: referenceForm.would_rehire,
+                    performance_rating: referenceForm.performance_rating ? Number(referenceForm.performance_rating) : null,
+                    conducted_by: referenceForm.conducted_by ? Number(referenceForm.conducted_by) : null,
                 }
+
+                if (editingItem) {
+                    await referenceCheckService.updateReferenceCheck(editingItem.id, referenceData)
+                } else {
+                    await referenceCheckService.createReferenceCheck(referenceData)
+                }
+                await fetchReferenceChecks()
             }
 
             setShowModal(false)
             setEditingItem(null)
             resetForms()
+
+            if (
+                !editingItem &&
+                ((modalType === "interview" && interviewsPage > 1) || (modalType === "reference" && referencesPage > 1))
+            ) {
+                if (modalType === "interview") {
+                    setInterviewsPage(1)
+                } else {
+                    setReferencesPage(1)
+                }
+            }
         } catch (error) {
             console.error("Failed to save item:", error)
-            alert("Failed to save. Please try again.")
+            alert(`Failed to save. Error: ${error.message}`)
         }
     }
 
     const resetForms = () => {
         setInterviewForm({
             application: "",
-            interviewer: "",
             interview_type: "phone",
             scheduled_date: "",
-            scheduled_time: "",
-            duration: 60,
+            duration_minutes: 60,
+            interviewer: "",
             location: "",
             notes: "",
-            status: "scheduled",
             rating: "",
+            status: "scheduled",
             feedback: "",
+            recommendation: "maybe",
+            manager: "",
+            questions_asked: "",
+            technical_assessment: "",
         })
         setReferenceForm({
             application: "",
             reference_name: "",
+            reference_title: "",
+            reference_company: "",
             reference_email: "",
             reference_phone: "",
             relationship: "",
-            company: "",
-            position: "",
-            contacted_date: "",
-            response_date: "",
             status: "pending",
-            rating: "",
-            comments: "",
+            contacted_date: "",
+            completed_date: "",
+            feedback: "",
             would_rehire: null,
+            performance_rating: "",
+            conducted_by: "",
         })
     }
 
@@ -1090,49 +299,71 @@ export default function Recruitment() {
 
         if (type === "interview") {
             setInterviewForm({
-                application: item.application?.id?.toString() || "",
-                interviewer: item.interviewer?.id?.toString() || "",
+                application: item.application?.toString() || "",
                 interview_type: item.interview_type || "phone",
-                scheduled_date: item.scheduled_date || "",
-                scheduled_time: item.scheduled_time || "",
-                duration: item.duration || 60,
+                scheduled_date: item.scheduled_date ? item.scheduled_date.split("T")[0] : "",
+                duration_minutes: item.duration_minutes || 60,
+                interviewer: item.interviewer?.toString() || "",
                 location: item.location || "",
                 notes: item.notes || "",
-                status: item.status || "scheduled",
                 rating: item.rating?.toString() || "",
+                status: item.status || "scheduled",
                 feedback: item.feedback || "",
+                recommendation: item.recommendation || "Maybe",
+                manager: item.manager?.toString() || "",
+                questions_asked: item.questions_asked || "",
+                technical_assessment: item.technical_assessment || "",
             })
         } else if (type === "reference") {
             setReferenceForm({
-                application: item.application?.id?.toString() || "",
+                application: item.application?.toString() || "",
                 reference_name: item.reference_name || "",
+                reference_title: item.reference_title || "",
+                reference_company: item.reference_company || "",
                 reference_email: item.reference_email || "",
                 reference_phone: item.reference_phone || "",
                 relationship: item.relationship || "",
-                company: item.company || "",
-                position: item.position || "",
-                contacted_date: item.contacted_date || "",
-                response_date: item.response_date || "",
                 status: item.status || "pending",
-                rating: item.rating?.toString() || "",
-                comments: item.comments || "",
+                contacted_date: item.contacted_date || "",
+                completed_date: item.completed_date || "",
+                feedback: item.feedback || "",
                 would_rehire: item.would_rehire,
+                performance_rating: item.performance_rating?.toString() || "",
+                conducted_by: item.conducted_by?.toString() || "",
             })
         }
         setShowModal(true)
     }
 
-    const handleDelete = async (id, type) => {
-        if (confirm("Are you sure you want to delete this item?")) {
-            try {
-                if (type === "interview") {
-                    setInterviews(interviews.filter((interview) => interview.id !== id))
-                } else if (type === "reference") {
-                    setReferenceChecks(referenceChecks.filter((ref) => ref.id !== id))
+    const handleDelete = (item, type) => {
+        setItemToDelete(item)
+        setDeleteType(type)
+        setShowDeleteModal(true)
+    }
+
+    const confirmDelete = async () => {
+        try {
+            if (deleteType === "interview") {
+                await interviewService.deleteInterview(itemToDelete)
+                await fetchInterviews()
+                const newTotalPages = Math.ceil((interviewsTotalItems - 1) / interviewsPerPage)
+                if (interviewsPage > newTotalPages && newTotalPages > 0) {
+                    setInterviewsPage(newTotalPages)
                 }
-            } catch (error) {
-                console.error("Failed to delete item:", error)
+            } else if (deleteType === "reference") {
+                await referenceCheckService.deleteReferenceCheck(itemToDelete)
+                await fetchReferenceChecks()
+                const newTotalPages = Math.ceil((referencesTotalItems - 1) / referencesPerPage)
+                if (referencesPage > newTotalPages && newTotalPages > 0) {
+                    setReferencesPage(newTotalPages)
+                }
             }
+            setShowDeleteModal(false)
+            setItemToDelete(null)
+            setDeleteType("")
+        } catch (error) {
+            console.error("Failed to delete item:", error)
+            alert("Failed to delete item. Please try again.")
         }
     }
 
@@ -1186,6 +417,12 @@ export default function Recruitment() {
         ))
     }
 
+    const formatDateTime = (dateTimeString) => {
+        if (!dateTimeString) return "N/A"
+        const date = new Date(dateTimeString)
+        return date.toLocaleDateString() + " " + date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    }
+
     if (loading) {
         return (
             <Layout>
@@ -1223,7 +460,7 @@ export default function Recruitment() {
                                 <div className="ml-5 w-0 flex-1">
                                     <dl>
                                         <dt className="text-sm font-medium text-gray-500 truncate">Total Interviews</dt>
-                                        <dd className="text-lg font-medium text-gray-900">{interviews.length}</dd>
+                                        <dd className="text-lg font-medium text-gray-900">{interviewsTotalItems}</dd>
                                     </dl>
                                 </div>
                             </div>
@@ -1239,7 +476,7 @@ export default function Recruitment() {
                                 <div className="ml-5 w-0 flex-1">
                                     <dl>
                                         <dt className="text-sm font-medium text-gray-500 truncate">Reference Checks</dt>
-                                        <dd className="text-lg font-medium text-gray-900">{referenceChecks.length}</dd>
+                                        <dd className="text-lg font-medium text-gray-900">{referencesTotalItems}</dd>
                                     </dl>
                                 </div>
                             </div>
@@ -1319,10 +556,9 @@ export default function Recruitment() {
                                         .map((interview) => (
                                             <div key={interview.id} className="flex items-center justify-between">
                                                 <div className="flex-1">
-                                                    <p className="text-sm font-medium text-gray-900">{interview.application?.candidate_name}</p>
+                                                    <p className="text-sm font-medium text-gray-900">{interview.applicant_name}</p>
                                                     <p className="text-sm text-gray-500">
-                                                        {interview.application?.job_posting?.title} • {interview.scheduled_date} at{" "}
-                                                        {interview.scheduled_time}
+                                                        {interview.job_title} • {formatDateTime(interview.scheduled_date)}
                                                     </p>
                                                 </div>
                                                 <div className="flex items-center space-x-2">
@@ -1349,15 +585,13 @@ export default function Recruitment() {
                                         .map((ref) => (
                                             <div key={ref.id} className="flex items-center justify-between">
                                                 <div className="flex-1">
-                                                    <p className="text-sm font-medium text-gray-900">{ref.application?.candidate_name}</p>
+                                                    <p className="text-sm font-medium text-gray-900">{ref.applicant_name}</p>
                                                     <p className="text-sm text-gray-500">
-                                                        {ref.reference_name} • {ref.company}
+                                                        {ref.reference_name} • {ref.reference_company}
                                                     </p>
                                                 </div>
                                                 <div className="flex items-center space-x-2">
-                                                    <span className="text-sm text-gray-500">
-                                                        Contacted: {ref.contacted_date ? new Date(ref.contacted_date).toLocaleDateString() : "N/A"}
-                                                    </span>
+                                                    <span className="text-sm text-gray-500">{ref.days_pending} days pending</span>
                                                 </div>
                                             </div>
                                         ))}
@@ -1393,7 +627,7 @@ export default function Recruitment() {
                             </div>
                         </div>
 
-                        <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+                        <div className="bg-white shadow-lg rounded-lg overflow-hidden mb-6">
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-50">
                                     <tr>
@@ -1425,17 +659,18 @@ export default function Recruitment() {
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
                                     {interviews
-                                        .filter((interview) =>
-                                            interview.application?.candidate_name?.toLowerCase().includes(searchTerm.toLowerCase()),
+                                        .filter(
+                                            (interview) =>
+                                                interview.applicant_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                                interview.job_title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                                interview.interviewer_name?.toLowerCase().includes(searchTerm.toLowerCase()),
                                         )
                                         .map((interview) => (
                                             <tr key={interview.id} className="hover:bg-gray-50">
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                    {interview.application?.candidate_name}
+                                                    {interview.applicant_name}
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                    {interview.application?.job_posting?.title}
-                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{interview.job_title}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <span
                                                         className={`px-2 py-1 text-xs rounded-full ${getInterviewTypeColor(interview.interview_type)}`}
@@ -1444,10 +679,10 @@ export default function Recruitment() {
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                    {interview.scheduled_date} {interview.scheduled_time}
+                                                    {formatDateTime(interview.scheduled_date)}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                    {interview.interviewer?.first_name} {interview.interviewer?.last_name}
+                                                    {interview.interviewer_name}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(interview.status)}`}>
@@ -1458,24 +693,56 @@ export default function Recruitment() {
                                                     <div className="flex">{renderStars(interview.rating)}</div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                    <button
-                                                        onClick={() => handleEdit(interview, "interview")}
-                                                        className="text-indigo-600 hover:text-indigo-900 mr-3"
-                                                    >
-                                                        <PencilIcon className="h-5 w-5" />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDelete(interview.id, "interview")}
-                                                        className="text-red-600 hover:text-red-900"
-                                                    >
-                                                        <TrashIcon className="h-5 w-5" />
-                                                    </button>
+                                                    <div className="flex items-center justify-end space-x-2">
+                                                        <button
+                                                            onClick={() => handleEdit(interview, "interview")}
+                                                            className="text-indigo-600 hover:text-indigo-900 p-1 rounded-md hover:bg-indigo-50 transition-colors"
+                                                            title="Edit Interview"
+                                                        >
+                                                            <PencilIcon className="h-4 w-4" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDelete(interview.id, "interview")}
+                                                            className="text-red-600 hover:text-red-900 p-1 rounded-md hover:bg-red-50 transition-colors"
+                                                            title="Delete Interview"
+                                                        >
+                                                            <TrashIcon className="h-4 w-4" />
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))}
                                 </tbody>
                             </table>
+                            {interviews.length === 0 && (
+                                <div className="text-center py-12">
+                                    <CalendarIcon className="mx-auto h-12 w-12 text-gray-400" />
+                                    <h3 className="mt-2 text-sm font-medium text-gray-900">No interviews</h3>
+                                    <p className="mt-1 text-sm text-gray-500">Get started by scheduling a new interview.</p>
+                                    <div className="mt-6">
+                                        <button
+                                            onClick={() => openModal("interview")}
+                                            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+                                        >
+                                            <PlusIcon className="-ml-1 mr-2 h-5 w-5" />
+                                            Schedule Interview
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
+                        {/* Interviews Pagination */}
+                        {interviewsTotalPages > 1 && (
+                            <Pagination
+                                currentPage={interviewsPage}
+                                totalPages={interviewsTotalPages}
+                                totalItems={interviewsTotalItems}
+                                itemsPerPage={interviewsPerPage}
+                                onPageChange={handleInterviewsPageChange}
+                                showInfo={true}
+                                showFirstLast={true}
+                            />
+                        )}
                     </div>
                 )}
 
@@ -1489,7 +756,7 @@ export default function Recruitment() {
                                 <input
                                     type="text"
                                     className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                                    placeholder="Search reference checks..."
+                                    placeholder="Search reference..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
@@ -1506,7 +773,7 @@ export default function Recruitment() {
                         </div>
 
                         <div className="bg-white shadow-lg rounded-lg overflow-hidden">
-                            <table className="min-w-full divide-y divide-gray-200">
+                            <table className="min-w-full divide-y divide-gray-200 mb-6">
                                 <thead className="bg-gray-50">
                                     <tr>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -1537,11 +804,11 @@ export default function Recruitment() {
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
                                     {referenceChecks
-                                        .filter((ref) => ref.application?.candidate_name?.toLowerCase().includes(searchTerm.toLowerCase()))
+                                        .filter((ref) => ref.applicant_name?.toLowerCase().includes(searchTerm.toLowerCase()))
                                         .map((ref) => (
                                             <tr key={ref.id} className="hover:bg-gray-50">
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                    {ref.application?.candidate_name}
+                                                    {ref.applicant_name}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div>
@@ -1549,7 +816,7 @@ export default function Recruitment() {
                                                         <div className="text-sm text-gray-500">{ref.reference_email}</div>
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ref.company}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ref.reference_company}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ref.relationship}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(ref.status)}`}>
@@ -1557,7 +824,7 @@ export default function Recruitment() {
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                    <div className="flex">{renderStars(ref.rating)}</div>
+                                                    <div className="flex">{renderStars(ref.performance_rating)}</div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                     {ref.would_rehire === true ? (
@@ -1586,7 +853,34 @@ export default function Recruitment() {
                                         ))}
                                 </tbody>
                             </table>
+                            {referenceChecks.length === 0 && (
+                                <div className="text-center py-12">
+                                    <PhoneIcon className="mx-auto h-12 w-12 text-gray-400" />
+                                    <h3 className="mt-2 text-sm font-medium text-gray-900">No reference checks</h3>
+                                    <p className="mt-1 text-sm text-gray-500">Get started by adding a new reference check.</p>
+                                    <div className="mt-6">
+                                        <button
+                                            onClick={() => openModal("reference")}
+                                            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+                                        >
+                                            <PlusIcon className="-ml-1 mr-2 h-5 w-5" />
+                                            Add Reference Check
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
+                        {referencesTotalPages > 1 && (
+                            <Pagination
+                                currentPage={referencesPage}
+                                totalPages={referencesTotalPages}
+                                totalItems={referencesTotalItems}
+                                itemsPerPage={referencesPerPage}
+                                onPageChange={handleReferencesPageChange}
+                                showInfo={true}
+                                showFirstLast={true}
+                            />
+                        )}
                     </div>
                 )}
 
@@ -1595,9 +889,21 @@ export default function Recruitment() {
                     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
                         <div className="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
                             <div className="mt-3">
-                                <h3 className="text-lg font-medium text-gray-900 mb-4">
-                                    {editingItem ? `Edit ${modalType}` : `Add New ${modalType}`}
-                                </h3>
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="text-lg font-medium text-gray-900">
+                                        {editingItem ? `Edit ${modalType}` : `Add New ${modalType}`}
+                                    </h3>
+                                    <button
+                                        onClick={() => {
+                                            setShowModal(false)
+                                            setEditingItem(null)
+                                            resetForms()
+                                        }}
+                                        className="text-gray-400 hover:text-gray-600"
+                                    >
+                                        <XMarkIcon className="h-6 w-6" />
+                                    </button>
+                                </div>
                                 <form onSubmit={handleSubmit} className="space-y-4">
                                     {modalType === "interview" && (
                                         <>
@@ -1611,9 +917,9 @@ export default function Recruitment() {
                                                         onChange={(e) => setInterviewForm({ ...interviewForm, application: e.target.value })}
                                                     >
                                                         <option value="">Select Application</option>
-                                                        {applications.map((app) => (
-                                                            <option key={app.id} value={app.id}>
-                                                                {app.candidate_name} - {app.job_posting?.title}
+                                                        {applications?.map((app) => (
+                                                            < option key={app.id} value={app.id} >
+                                                                {app.applicant_name} - {app.job_title}
                                                             </option>
                                                         ))}
                                                     </select>
@@ -1653,7 +959,7 @@ export default function Recruitment() {
                                                 <div>
                                                     <label className="block text-sm font-medium text-gray-700">Date *</label>
                                                     <input
-                                                        type="date"
+                                                        type="datetime-local"
                                                         required
                                                         className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                                                         value={interviewForm.scheduled_date}
@@ -1661,30 +967,20 @@ export default function Recruitment() {
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-700">Time *</label>
-                                                    <input
-                                                        type="time"
-                                                        required
-                                                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                                                        value={interviewForm.scheduled_time}
-                                                        onChange={(e) => setInterviewForm({ ...interviewForm, scheduled_time: e.target.value })}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div>
                                                     <label className="block text-sm font-medium text-gray-700">Duration (minutes)</label>
                                                     <input
                                                         type="number"
                                                         min="15"
-                                                        max="240"
+                                                        max="480"
                                                         className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                                                        value={interviewForm.duration}
+                                                        value={interviewForm.duration_minutes}
                                                         onChange={(e) =>
-                                                            setInterviewForm({ ...interviewForm, duration: Number.parseInt(e.target.value) })
+                                                            setInterviewForm({ ...interviewForm, duration_minutes: Number.parseInt(e.target.value) })
                                                         }
                                                     />
                                                 </div>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-4">
                                                 <div>
                                                     <label className="block text-sm font-medium text-gray-700">Status</label>
                                                     <select
@@ -1696,6 +992,21 @@ export default function Recruitment() {
                                                         <option value="completed">Completed</option>
                                                         <option value="cancelled">Cancelled</option>
                                                         <option value="no_show">No Show</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700">Manager</label>
+                                                    <select
+                                                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                                        value={interviewForm.manager}
+                                                        onChange={(e) => setInterviewForm({ ...interviewForm, manager: e.target.value })}
+                                                    >
+                                                        <option value="">Select Manager</option>
+                                                        {managers.map((manager) => (
+                                                            <option key={manager.id} value={manager.id}>
+                                                                {manager.employee_name} {manager.employee_number}
+                                                            </option>
+                                                        ))}
                                                     </select>
                                                 </div>
                                             </div>
@@ -1711,20 +1022,36 @@ export default function Recruitment() {
                                             </div>
                                             {interviewForm.status === "completed" && (
                                                 <>
-                                                    <div>
-                                                        <label className="block text-sm font-medium text-gray-700">Rating (1-5)</label>
-                                                        <select
-                                                            className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                                                            value={interviewForm.rating}
-                                                            onChange={(e) => setInterviewForm({ ...interviewForm, rating: e.target.value })}
-                                                        >
-                                                            <option value="">Select Rating</option>
-                                                            {[1, 2, 3, 4, 5].map((rating) => (
-                                                                <option key={rating} value={rating}>
-                                                                    {rating} Star{rating > 1 ? "s" : ""}
-                                                                </option>
-                                                            ))}
-                                                        </select>
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        <div>
+                                                            <label className="block text-sm font-medium text-gray-700">Rating (1-5)</label>
+                                                            <select
+                                                                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                                                value={interviewForm.rating}
+                                                                onChange={(e) => setInterviewForm({ ...interviewForm, rating: e.target.value })}
+                                                            >
+                                                                <option value="">Select Rating</option>
+                                                                {[1, 2, 3, 4, 5].map((rating) => (
+                                                                    <option key={rating} value={rating}>
+                                                                        {rating} Star{rating > 1 ? "s" : ""}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-sm font-medium text-gray-700">Recommendation</label>
+                                                            <select
+                                                                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                                                value={interviewForm.recommendation}
+                                                                onChange={(e) => setInterviewForm({ ...interviewForm, recommendation: e.target.value })}
+                                                            >
+                                                                <option value="maybe">Maybe</option>
+                                                                <option value="strong_hire">Strong Hire</option>
+                                                                <option value="hire">Hire</option>
+                                                                <option value="no_hire">No Hire</option>
+                                                                <option value="strong_no_hire">Strong No Hire</option>
+                                                            </select>
+                                                        </div>
                                                     </div>
                                                     <div>
                                                         <label className="block text-sm font-medium text-gray-700">Feedback</label>
@@ -1733,6 +1060,26 @@ export default function Recruitment() {
                                                             className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                                                             value={interviewForm.feedback}
                                                             onChange={(e) => setInterviewForm({ ...interviewForm, feedback: e.target.value })}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700">Questions Asked</label>
+                                                        <textarea
+                                                            rows={2}
+                                                            className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                                            value={interviewForm.questions_asked}
+                                                            onChange={(e) => setInterviewForm({ ...interviewForm, questions_asked: e.target.value })}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700">Technical Assessment</label>
+                                                        <textarea
+                                                            rows={2}
+                                                            className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                                            value={interviewForm.technical_assessment}
+                                                            onChange={(e) =>
+                                                                setInterviewForm({ ...interviewForm, technical_assessment: e.target.value })
+                                                            }
                                                         />
                                                     </div>
                                                 </>
@@ -1759,10 +1106,11 @@ export default function Recruitment() {
                                                     value={referenceForm.application}
                                                     onChange={(e) => setReferenceForm({ ...referenceForm, application: e.target.value })}
                                                 >
+
                                                     <option value="">Select Application</option>
-                                                    {applications.map((app) => (
-                                                        <option key={app.id} value={app.id}>
-                                                            {app.candidate_name} - {app.job_posting?.title}
+                                                    {completedTechnicalInterviews.map((interview) => (
+                                                        <option key={interview.application} value={interview.application}>
+                                                            {interview.applicant_name} - {interview.job_title}
                                                         </option>
                                                     ))}
                                                 </select>
@@ -1800,6 +1148,26 @@ export default function Recruitment() {
                                                     />
                                                 </div>
                                                 <div>
+                                                    <label className="block text-sm font-medium text-gray-700">Title</label>
+                                                    <input
+                                                        type="text"
+                                                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                                        value={referenceForm.reference_title}
+                                                        onChange={(e) => setReferenceForm({ ...referenceForm, reference_title: e.target.value })}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700">Company</label>
+                                                    <input
+                                                        type="text"
+                                                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                                        value={referenceForm.reference_company}
+                                                        onChange={(e) => setReferenceForm({ ...referenceForm, reference_company: e.target.value })}
+                                                    />
+                                                </div>
+                                                <div>
                                                     <label className="block text-sm font-medium text-gray-700">Relationship *</label>
                                                     <select
                                                         required
@@ -1816,26 +1184,6 @@ export default function Recruitment() {
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div>
-                                                    <label className="block text-sm font-medium text-gray-700">Company</label>
-                                                    <input
-                                                        type="text"
-                                                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                                                        value={referenceForm.company}
-                                                        onChange={(e) => setReferenceForm({ ...referenceForm, company: e.target.value })}
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-sm font-medium text-gray-700">Position</label>
-                                                    <input
-                                                        type="text"
-                                                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                                                        value={referenceForm.position}
-                                                        onChange={(e) => setReferenceForm({ ...referenceForm, position: e.target.value })}
-                                                    />
-                                                </div>
-                                            </div>
                                             <div className="grid grid-cols-3 gap-4">
                                                 <div>
                                                     <label className="block text-sm font-medium text-gray-700">Contacted Date</label>
@@ -1847,12 +1195,12 @@ export default function Recruitment() {
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-700">Response Date</label>
+                                                    <label className="block text-sm font-medium text-gray-700">Completed Date</label>
                                                     <input
                                                         type="date"
                                                         className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                                                        value={referenceForm.response_date}
-                                                        onChange={(e) => setReferenceForm({ ...referenceForm, response_date: e.target.value })}
+                                                        value={referenceForm.completed_date}
+                                                        onChange={(e) => setReferenceForm({ ...referenceForm, completed_date: e.target.value })}
                                                     />
                                                 </div>
                                                 <div>
@@ -1868,15 +1216,34 @@ export default function Recruitment() {
                                                     </select>
                                                 </div>
                                             </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700">Conducted By</label>
+                                                <select
+                                                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                                    value={referenceForm.conducted_by}
+                                                    onChange={(e) => setReferenceForm({ ...referenceForm, conducted_by: e.target.value })}
+                                                >
+                                                    <option value="">Select Employee</option>
+                                                    {employees.map((emp) => (
+                                                        <option key={emp.id} value={emp.id}>
+                                                            {emp.first_name} {emp.last_name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
                                             {referenceForm.status === "completed" && (
                                                 <>
                                                     <div className="grid grid-cols-2 gap-4">
                                                         <div>
-                                                            <label className="block text-sm font-medium text-gray-700">Rating (1-5)</label>
+                                                            <label className="block text-sm font-medium text-gray-700">
+                                                                Performance Rating (1-5)
+                                                            </label>
                                                             <select
                                                                 className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                                                                value={referenceForm.rating}
-                                                                onChange={(e) => setReferenceForm({ ...referenceForm, rating: e.target.value })}
+                                                                value={referenceForm.performance_rating}
+                                                                onChange={(e) =>
+                                                                    setReferenceForm({ ...referenceForm, performance_rating: e.target.value })
+                                                                }
                                                             >
                                                                 <option value="">Select Rating</option>
                                                                 {[1, 2, 3, 4, 5].map((rating) => (
@@ -1905,12 +1272,12 @@ export default function Recruitment() {
                                                         </div>
                                                     </div>
                                                     <div>
-                                                        <label className="block text-sm font-medium text-gray-700">Comments</label>
+                                                        <label className="block text-sm font-medium text-gray-700">Feedback</label>
                                                         <textarea
                                                             rows={3}
                                                             className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                                                            value={referenceForm.comments}
-                                                            onChange={(e) => setReferenceForm({ ...referenceForm, comments: e.target.value })}
+                                                            value={referenceForm.feedback}
+                                                            onChange={(e) => setReferenceForm({ ...referenceForm, feedback: e.target.value })}
                                                         />
                                                     </div>
                                                 </>
@@ -1942,7 +1309,45 @@ export default function Recruitment() {
                         </div>
                     </div>
                 )}
+                {/* Delete Confirmation Modal */}
+                {showDeleteModal && (
+                    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+                        <div className="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
+                            <div className="mt-3">
+                                <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                                    <ExclamationTriangleIcon className="h-6 w-6 text-red-600" />
+                                </div>
+                                <div className="text-center">
+                                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                                        Delete {deleteType === "interview" ? "Interview" : "Reference Check"}
+                                    </h3>
+                                    <p className="text-sm text-gray-500 mb-4">
+                                        Are you sure you want to delete this {deleteType}? This action cannot be undone.
+                                    </p>
+                                </div>
+                                <div className="flex justify-center space-x-3">
+                                    <button
+                                        onClick={() => {
+                                            setShowDeleteModal(false)
+                                            setItemToDelete(null)
+                                            setDeleteType("")
+                                        }}
+                                        className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={confirmDelete}
+                                        className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700"
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
-        </Layout>
+        </Layout >
     )
 }

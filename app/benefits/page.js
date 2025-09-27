@@ -62,23 +62,30 @@ export default function Benefits() {
           <nav className="-mb-px flex space-x-8">
             <button
               onClick={() => setActiveTab("plans")}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === "plans"
-                  ? "border-indigo-500 text-indigo-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              }`}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === "plans"
+                ? "border-indigo-500 text-indigo-600"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
             >
               Benefit Plans
             </button>
             <button
               onClick={() => setActiveTab("enrollments")}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === "enrollments"
-                  ? "border-indigo-500 text-indigo-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              }`}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === "enrollments"
+                ? "border-indigo-500 text-indigo-600"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
             >
-              Enrollments
+              Benefit Enrollments
+            </button>
+            <button
+              onClick={() => setActiveTab("claims")}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === "claims"
+                ? "border-indigo-500 text-indigo-600"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+            >
+              Benefit Claims
             </button>
           </nav>
         </div>
@@ -109,17 +116,17 @@ export default function Benefits() {
                   <div className="mt-4 flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-900">Monthly Premium</p>
-                      <p className="text-lg font-bold text-indigo-600">${plan.monthly_premium || "299"}</p>
+                      <p className="text-lg font-bold text-indigo-600">${plan.total_cost || "299"}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-medium text-gray-900">Coverage</p>
-                      <p className="text-sm text-gray-600">{plan.coverage_level || "80%"}</p>
+                      <p className="text-sm text-gray-600">{plan.coverage_details.coverage_level || "80%"}</p>
                     </div>
                   </div>
                   <div className="mt-6">
-                    <button className="w-full bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors">
+                    {/* <button className="w-full bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors">
                       View Details
-                    </button>
+                    </button> */}
                   </div>
                 </div>
               </div>
@@ -290,11 +297,10 @@ export default function Benefits() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          enrollment.status === "active"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-yellow-100 text-yellow-800"
-                        }`}
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${enrollment.status === "active"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-yellow-100 text-yellow-800"
+                          }`}
                       >
                         {enrollment.status || "Active"}
                       </span>

@@ -845,13 +845,13 @@ export default function Audit() {
                                     {loginAttempts
                                         .filter(
                                             (attempt) =>
-                                                attempt.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                                attempt.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                                                 attempt.ip_address?.toLowerCase().includes(searchTerm.toLowerCase()),
                                         )
                                         .map((attempt) => (
                                             <tr key={attempt.id} className="hover:bg-gray-50">
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                    {attempt.username}
+                                                    {attempt.email}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(attempt.status)}`}>
@@ -861,7 +861,7 @@ export default function Audit() {
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{attempt.ip_address}</td>
                                                 <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">{attempt.user_agent}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                    {attempt.timestamp ? new Date(attempt.timestamp).toLocaleString() : "N/A"}
+                                                    {attempt.created_at ? new Date(attempt.created_at).toLocaleString() : "N/A"}
                                                 </td>
                                             </tr>
                                         ))}

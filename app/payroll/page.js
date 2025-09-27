@@ -2,77 +2,18 @@
 
 import { useState, useEffect } from "react"
 import Layout from "../../components/Layout"
+import Pagination from "../../components/Pagination"
 import { payrollService, departmentService, positionService, employeeService } from "../../lib/services"
 import { useAuth } from "../../contexts/AuthContext"
+import { XMarkIcon, UsersIcon, CurrencyDollarIcon, ChartBarIcon, PlusIcon, PencilIcon, TrashIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline"
 
-// Icons
-const UsersIcon = ({ className }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"
-    />
-  </svg>
-)
-
-const CurrencyDollarIcon = ({ className }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.467-.22-2.121-.659-1.172-.879-1.172-2.303 0-3.182C10.464 7.78 11.232 7.5 12 7.5c.768 0 1.536.22 2.121.659l.879.659m-4.242 0V6m0 12v1.5m0-1.5H9m3 0h3"
-    />
-  </svg>
-)
-
-const ChartBarIcon = ({ className }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"
-    />
-  </svg>
-)
-
-const PlusIcon = ({ className }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-  </svg>
-)
-
-const PencilIcon = ({ className }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-    />
-  </svg>
-)
-
-const EyeIcon = ({ className }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
-    />
-    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-  </svg>
-)
 
 export default function Payroll() {
-  const { user } = useAuth() // Moved useAuth hook to the top level
+  const { user } = useAuth()
   const [payrollRecords, setPayrollRecords] = useState([])
   const [departments, setDepartments] = useState([])
   const [positions, setPositions] = useState([])
-  const [statistics, setStatistics] = useState({
-    totalEmployees: 0,
-    monthlyPayroll: 0,
-    avgSalary: 0,
-  })
+  const [statistics, setStatistics] = useState()
   const [recentActivity, setRecentActivity] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedDepartment, setSelectedDepartment] = useState("All Departments")
@@ -81,6 +22,16 @@ export default function Payroll() {
   const [error, setError] = useState("")
   const [jobLevels, setJobLevels] = useState([])
   const [employees, setEmployees] = useState([])
+  const [editingPayroll, setEditingPayroll] = useState(null)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [payrollToDelete, setPayrollToDelete] = useState(null)
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(0)
+  const [totalItems, setTotalItems] = useState(0)
+  const itemsPerPage = 5
+
   const [formData, setFormData] = useState({
     employee: "",
     pay_period_start: "",
@@ -90,7 +41,7 @@ export default function Payroll() {
     total_deductions: "",
     total_bonuses: "",
     status: "draft",
-    manager: "",
+    manager: 16,
     processed_by: "",
     // Additional fields for payroll items
     baseSalary: "",
@@ -104,9 +55,35 @@ export default function Payroll() {
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState("")
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "draft":
+        return "bg-yellow-100 text-yellow-800"
+      case "approved":
+        return "bg-orange-100 text-orange-800"
+      case "paid":
+        return "bg-green-100 text-green-800"
+      default:
+        return "bg-yellow-100 text-yellow-800"
+    }
+  }
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case "draft":
+        return "Draft"
+      case "approved":
+        return "Approved"
+      case "paid":
+        return "Paid"
+      default:
+        return status.charAt(0).toUpperCase() + status.slice(1)
+    }
+  }
+
   useEffect(() => {
     fetchData()
-  }, [])
+  }, [currentPage])
 
   const fetchData = async () => {
     try {
@@ -115,26 +92,26 @@ export default function Payroll() {
 
       const [payrollsData, departmentsData, positionsData, statisticsData, activityData, employeesData] =
         await Promise.all([
-          payrollService.getPayrolls(),
+          payrollService.getPayrolls(currentPage, itemsPerPage),
           departmentService.getDepartments(),
           positionService.getPositions(),
           payrollService.getPayrollStatistics(),
           payrollService.getRecentActivity(),
-          employeeService.getEmployees(),
+          employeeService.getEmployees(1, 100),
         ])
 
-      setEmployees(employeesData)
+      setEmployees(employeesData.results || employeesData)
 
       // Extract unique job levels from positions
-      const uniqueLevels = [...new Set(positionsData.map((pos) => pos.level || pos.name).filter(Boolean))]
+      const uniqueLevels = [...new Set(positionsData.map((pos) => pos.title).filter(Boolean))]
       setJobLevels(uniqueLevels)
 
       // Transform payroll data to match UI format
-      const transformedPayrolls = payrollsData.map((payroll) => ({
+      const transformedPayrolls = payrollsData.results.map((payroll) => ({
         id: payroll.id,
         name: payroll.employee_name || "Unknown Employee",
-        department: payroll.employee?.department?.name || "Unknown",
-        jobLevel: payroll.employee?.position?.level || "Unknown",
+        department: payroll?.department_name || "Unknown Department",
+        jobLevel: payroll?.job_title || "Unknown Job level",
         dateRange: formatDateRange(payroll.pay_period_start, payroll.pay_period_end),
         processed: formatProcessedDate(payroll.created_at),
         baseSalary: payroll.gross_pay || 0,
@@ -142,9 +119,13 @@ export default function Payroll() {
         deductions: -(payroll.total_deductions || 0),
         totalPay: payroll.net_pay || 0,
         status: payroll.status || "draft",
+        // Store original data for editing
+        originalData: payroll,
       }))
 
       setPayrollRecords(transformedPayrolls)
+      setTotalPages(payrollsData.total_pages)
+      setTotalItems(payrollsData.count)
       setDepartments(departmentsData)
       setPositions(positionsData)
       setStatistics(statisticsData)
@@ -153,62 +134,26 @@ export default function Payroll() {
       console.error("Failed to fetch payroll data:", error)
       setError("Failed to load payroll data. Please try again.")
 
-      // Fallback to mock data if API fails
-      setPayrollRecords([
-        {
-          id: 1,
-          name: "Olivia Garcia",
-          department: "Sales",
-          jobLevel: "Mid",
-          dateRange: "Jun 15, 2025 7:00 pm - Jun 30, 2025 6:59 pm",
-          processed: "Jul 1, 2025 4:30 pm",
-          baseSalary: 65000,
-          bonus: 3500,
-          deductions: -800,
-          totalPay: 67700,
-          status: "approved",
-        },
-        {
-          id: 2,
-          name: "Henry Bennett",
-          department: "Marketing",
-          jobLevel: "Senior",
-          dateRange: "Jun 15, 2025 7:00 pm - Jun 30, 2025 6:59 pm",
-          processed: "Jul 1, 2025 4:45 pm",
-          baseSalary: 85000,
-          bonus: 5000,
-          deductions: -1000,
-          totalPay: 89500,
-          status: "approved",
-        },
-      ])
-
-      setStatistics({
-        totalEmployees: 156,
-        monthlyPayroll: 847250,
-        avgSalary: 65400,
-      })
-
-      setRecentActivity([
-        {
-          id: 1,
-          text: "Payroll processed for Engineering",
-          time: "2 hours ago",
-          color: "bg-green-500",
-        },
-        {
-          id: 2,
-          text: "New bonus record added",
-          time: "1 day ago",
-          color: "bg-blue-500",
-        },
-        {
-          id: 3,
-          text: "Salary adjustment processed",
-          time: "3 days ago",
-          color: "bg-yellow-500",
-        },
-      ])
+      // setRecentActivity([
+      //   {
+      //     id: 1,
+      //     text: "Payroll processed for Engineering",
+      //     time: "2 hours ago",
+      //     color: "bg-green-500",
+      //   },
+      //   {
+      //     id: 2,
+      //     text: "New bonus record added",
+      //     time: "1 day ago",
+      //     color: "bg-blue-500",
+      //   },
+      //   {
+      //     id: 3,
+      //     text: "Salary adjustment processed",
+      //     time: "3 days ago",
+      //     color: "bg-yellow-500",
+      //   },
+      // ])
     } finally {
       setLoading(false)
     }
@@ -250,7 +195,8 @@ export default function Payroll() {
 
   const handleCreatePayroll = async () => {
     try {
-      // This would open a modal or navigate to create payroll form
+      setEditingPayroll(null)
+      resetForm()
       setShowCreateModal(true)
     } catch (error) {
       console.error("Failed to create payroll:", error)
@@ -260,21 +206,71 @@ export default function Payroll() {
 
   const handleEditPayroll = async (payrollId) => {
     try {
-      // Navigate to edit payroll or open edit modal
-      console.log("Edit payroll:", payrollId)
+      setLoading(true)
+      const payrollData = await payrollService.getPayroll(payrollId)
+
+      // Populate form with existing data
+      setFormData({
+        employee: payrollData.employee,
+        pay_period_start: payrollData.pay_period_start ? payrollData.pay_period_start.split("T")[0] : "",
+        pay_period_end: payrollData.pay_period_end ? payrollData.pay_period_end.split("T")[0] : "",
+        pay_date: payrollData.pay_date ? payrollData.pay_date.split("T")[0] : "",
+        gross_pay: payrollData.gross_pay?.toString() || "",
+        total_deductions: payrollData.total_deductions?.toString() || "",
+        total_bonuses: payrollData.total_bonuses?.toString() || "",
+        status: payrollData.status || "draft",
+        manager: payrollData.manager?.toString() || "16",
+        processed_by: payrollData.processed_by?.toString() || "",
+        // Additional fields - you may need to adjust these based on your API structure
+        baseSalary: payrollData.gross_pay?.toString() || "",
+        bonusAmount: payrollData.total_bonuses?.toString() || "",
+        overtimeHours: "",
+        overtimeRate: "",
+        taxDeductions: payrollData.total_deductions?.toString() || "",
+        otherDeductions: "",
+        notes: payrollData.notes || "",
+      })
+
+      setEditingPayroll(payrollData)
+      setShowCreateModal(true)
     } catch (error) {
-      console.error("Failed to edit payroll:", error)
-      setError("Failed to edit payroll. Please try again.")
+      console.error("Failed to fetch payroll for editing:", error)
+      setError("Failed to load payroll data for editing. Please try again.")
+    } finally {
+      setLoading(false)
     }
   }
 
-  const handleViewEmployee = async (payrollId) => {
+  const handleDeletePayroll = (payrollId, payrollName) => {
+    setPayrollToDelete({ id: payrollId, name: payrollName })
+    setShowDeleteModal(true)
+  }
+
+  const confirmDelete = async () => {
     try {
-      // Navigate to employee details
-      console.log("View employee for payroll:", payrollId)
+      setLoading(true)
+      await payrollService.deletePayroll(payrollToDelete.id)
+
+      // Refresh data after deletion
+      await fetchData()
+
+      // If we're on a page that no longer has data, go to previous page
+      if (payrollRecords.length === 1 && currentPage > 1) {
+        setCurrentPage(currentPage - 1)
+      }
+
+      setShowDeleteModal(false)
+      setPayrollToDelete(null)
     } catch (error) {
-      console.error("Failed to view employee:", error)
+      console.error("Failed to delete payroll:", error)
+      setError("Failed to delete payroll. Please try again.")
+    } finally {
+      setLoading(false)
     }
+  }
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page)
   }
 
   // Filter payroll records based on selected filters
@@ -310,7 +306,7 @@ export default function Payroll() {
       total_deductions: "",
       total_bonuses: "",
       status: "draft",
-      manager: "",
+      manager: "16",
       processed_by: "",
       baseSalary: "",
       bonusAmount: "",
@@ -335,83 +331,88 @@ export default function Payroll() {
         employee: Number.parseInt(formData.employee),
         pay_period_start: formData.pay_period_start,
         pay_period_end: formData.pay_period_end,
-        pay_date: formData.pay_date || formData.pay_period_end, // Default to period end if not specified
+        pay_date: formData.pay_date || formData.pay_period_end,
         gross_pay: calculations.grossPay.toString(),
         total_deductions: calculations.totalDeductions.toString(),
         total_bonuses: calculations.totalBonuses.toString(),
         status: formData.status || "draft",
-        manager: user?.manager_id || 0, // You might need to adjust this based on your user structure
+        manager: user?.manager_id || 3,
         processed_by: user?.id || 0,
       }
 
-      const createdPayroll = await payrollService.createPayroll(payrollData)
+      if (editingPayroll) {
+        // Update existing payroll
+        await payrollService.updatePayroll(editingPayroll.id, payrollData)
+      } else {
+        // Create new payroll
+        const createdPayroll = await payrollService.createPayroll(payrollData)
 
-      // Create payroll items for detailed breakdown
-      const payrollItems = []
+        // Create payroll items for detailed breakdown (only for new payrolls)
+        const payrollItems = []
 
-      if (formData.baseSalary && Number.parseFloat(formData.baseSalary) > 0) {
-        payrollItems.push({
-          item_type: "earning",
-          item_name: "Base Salary",
-          amount: formData.baseSalary,
-          description: "Regular base salary",
-          is_taxable: true,
-        })
-      }
+        if (formData.baseSalary && Number.parseFloat(formData.baseSalary) > 0) {
+          payrollItems.push({
+            item_type: "earning",
+            item_name: "Base Salary",
+            amount: formData.baseSalary,
+            description: "Regular base salary",
+            is_taxable: true,
+          })
+        }
 
-      if (formData.bonusAmount && Number.parseFloat(formData.bonusAmount) > 0) {
-        payrollItems.push({
-          item_type: "earning",
-          item_name: "Bonus",
-          amount: formData.bonusAmount,
-          description: "Performance bonus",
-          is_taxable: true,
-        })
-      }
+        if (formData.bonusAmount && Number.parseFloat(formData.bonusAmount) > 0) {
+          payrollItems.push({
+            item_type: "earning",
+            item_name: "Bonus",
+            amount: formData.bonusAmount,
+            description: "Performance bonus",
+            is_taxable: true,
+          })
+        }
 
-      if (
-        formData.overtimeHours &&
-        formData.overtimeRate &&
-        Number.parseFloat(formData.overtimeHours) > 0 &&
-        Number.parseFloat(formData.overtimeRate) > 0
-      ) {
-        const overtimePay = Number.parseFloat(formData.overtimeHours) * Number.parseFloat(formData.overtimeRate)
-        payrollItems.push({
-          item_type: "earning",
-          item_name: "Overtime Pay",
-          amount: overtimePay.toString(),
-          description: `${formData.overtimeHours} hours at $${formData.overtimeRate}/hour`,
-          is_taxable: true,
-        })
-      }
+        if (
+          formData.overtimeHours &&
+          formData.overtimeRate &&
+          Number.parseFloat(formData.overtimeHours) > 0 &&
+          Number.parseFloat(formData.overtimeRate) > 0
+        ) {
+          const overtimePay = Number.parseFloat(formData.overtimeHours) * Number.parseFloat(formData.overtimeRate)
+          payrollItems.push({
+            item_type: "earning",
+            item_name: "Overtime Pay",
+            amount: overtimePay.toString(),
+            description: `${formData.overtimeHours} hours at $${formData.overtimeRate}/hour`,
+            is_taxable: true,
+          })
+        }
 
-      if (formData.taxDeductions && Number.parseFloat(formData.taxDeductions) > 0) {
-        payrollItems.push({
-          item_type: "deduction",
-          item_name: "Tax Deductions",
-          amount: formData.taxDeductions,
-          description: "Federal and state taxes",
-          is_taxable: false,
-        })
-      }
+        if (formData.taxDeductions && Number.parseFloat(formData.taxDeductions) > 0) {
+          payrollItems.push({
+            item_type: "deduction",
+            item_name: "Tax Deductions",
+            amount: formData.taxDeductions,
+            description: "Federal and state taxes",
+            is_taxable: false,
+          })
+        }
 
-      if (formData.otherDeductions && Number.parseFloat(formData.otherDeductions) > 0) {
-        payrollItems.push({
-          item_type: "deduction",
-          item_name: "Other Deductions",
-          amount: formData.otherDeductions,
-          description: formData.notes || "Other deductions",
-          is_taxable: false,
-        })
-      }
+        if (formData.otherDeductions && Number.parseFloat(formData.otherDeductions) > 0) {
+          payrollItems.push({
+            item_type: "deduction",
+            item_name: "Other Deductions",
+            amount: formData.otherDeductions,
+            description: formData.notes || "Other deductions",
+            is_taxable: false,
+          })
+        }
 
-      // Create payroll items if the API supports it
-      for (const item of payrollItems) {
-        try {
-          await payrollService.createPayrollItem(createdPayroll.id, item)
-        } catch (itemError) {
-          console.warn("Failed to create payroll item:", itemError)
-          // Continue with other items even if one fails
+        // Create payroll items if the API supports it
+        for (const item of payrollItems) {
+          try {
+            await payrollService.createPayrollItem(createdPayroll.id, item)
+          } catch (itemError) {
+            console.warn("Failed to create payroll item:", itemError)
+          }
         }
       }
 
@@ -420,13 +421,13 @@ export default function Payroll() {
 
       // Close modal and reset form
       setShowCreateModal(false)
+      setEditingPayroll(null)
       resetForm()
 
-      // Show success message
-      console.log("Payroll created successfully!")
+      console.log(editingPayroll ? "Payroll updated successfully!" : "Payroll created successfully!")
     } catch (error) {
-      console.error("Failed to create payroll:", error)
-      setSubmitError(error.response?.data?.message || "Failed to create payroll. Please try again.")
+      console.error("Failed to save payroll:", error)
+      setSubmitError(error.response?.data?.message || "Failed to save payroll. Please try again.")
     } finally {
       setSubmitting(false)
     }
@@ -521,7 +522,7 @@ export default function Payroll() {
             </div>
 
             {/* Payroll Records */}
-            <div className="space-y-4">
+            <div className="space-y-4 mb-6">
               {filteredPayrollRecords.length === 0 ? (
                 <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
                   <div className="text-gray-500">No payroll records found</div>
@@ -537,8 +538,15 @@ export default function Payroll() {
                 filteredPayrollRecords.map((record) => (
                   <div key={record.id} className="bg-white rounded-lg border border-gray-200 p-6">
                     <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900">{record.name}</h3>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <h3 className="text-lg font-semibold text-gray-900">{record.name}</h3>
+                          <span
+                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(record.status)}`}
+                          >
+                            {getStatusLabel(record.status)}
+                          </span>
+                        </div>
                         <p className="text-sm text-gray-600">
                           {record.department} - {record.jobLevel}
                         </p>
@@ -574,17 +582,17 @@ export default function Payroll() {
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleEditPayroll(record.id)}
-                          className="inline-flex items-center px-3 py-1 text-sm text-gray-600 hover:text-gray-900"
+                          className="inline-flex items-center px-3 py-1 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
                         >
                           <PencilIcon className="h-4 w-4 mr-1" />
                           Edit
                         </button>
                         <button
-                          onClick={() => handleViewEmployee(record.id)}
-                          className="inline-flex items-center px-3 py-1 text-sm text-gray-600 hover:text-gray-900"
+                          onClick={() => handleDeletePayroll(record.id, record.name)}
+                          className="inline-flex items-center px-3 py-1 text-sm text-red-600 hover:text-red-900 hover:bg-red-50 rounded-md transition-colors"
                         >
-                          <EyeIcon className="h-4 w-4 mr-1" />
-                          View Employee
+                          <TrashIcon className="h-4 w-4 mr-1" />
+                          Delete
                         </button>
                       </div>
                     </div>
@@ -592,6 +600,19 @@ export default function Payroll() {
                 ))
               )}
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={totalItems}
+                itemsPerPage={itemsPerPage}
+                onPageChange={handlePageChange}
+                showInfo={true}
+                showFirstLast={true}
+              />
+            )}
           </div>
 
           {/* Right Sidebar */}
@@ -615,7 +636,7 @@ export default function Payroll() {
                   <div>
                     <div className="text-sm text-gray-600">Monthly Payroll</div>
                     <div className="text-2xl font-bold text-gray-900">
-                      ${statistics.monthlyPayroll.toLocaleString()}
+                      ${statistics.monthlyPayroll}
                     </div>
                   </div>
                   <div className="p-2 bg-green-100 rounded-lg">
@@ -627,7 +648,7 @@ export default function Payroll() {
                   <div>
                     <div className="text-sm text-gray-600">Avg Salary</div>
                     <div className="text-2xl font-bold text-gray-900">
-                      ${Math.round(statistics.avgSalary).toLocaleString()}
+                      ${statistics.avgSalary}
                     </div>
                   </div>
                   <div className="p-2 bg-purple-100 rounded-lg">
@@ -660,13 +681,29 @@ export default function Payroll() {
           </div>
         </div>
 
-        {/* Create Payroll Modal */}
+        {/* Create/Edit Payroll Modal */}
         {showCreateModal && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
             <div className="relative top-10 mx-auto p-6 border w-full max-w-2xl shadow-lg rounded-md bg-white">
-              <div className="mb-4">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Create New Payroll</h3>
-                <p className="text-sm text-gray-600">Create a new payroll record for an employee</p>
+              <div className="flex justify-between items-center mb-4">
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    {editingPayroll ? "Edit Payroll" : "Create New Payroll"}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    {editingPayroll ? "Update the payroll record" : "Create a new payroll record for an employee"}
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowCreateModal(false)
+                    setEditingPayroll(null)
+                    resetForm()
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <XMarkIcon className="h-6 w-6" />
+                </button>
               </div>
 
               <form onSubmit={handleSubmitPayroll} className="space-y-6">
@@ -682,7 +719,7 @@ export default function Payroll() {
                       <option value="">Select Employee</option>
                       {employees.map((emp) => (
                         <option key={emp.id} value={emp.id}>
-                          {emp.first_name} {emp.last_name} - {emp.department?.name}
+                          {emp.first_name} {emp.last_name} - {emp.department_name}
                         </option>
                       ))}
                     </select>
@@ -816,7 +853,6 @@ export default function Payroll() {
                       className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     >
                       <option value="draft">Draft</option>
-                      <option value="pending">Pending</option>
                       <option value="approved">Approved</option>
                       <option value="paid">Paid</option>
                     </select>
@@ -891,6 +927,7 @@ export default function Payroll() {
                     type="button"
                     onClick={() => {
                       setShowCreateModal(false)
+                      setEditingPayroll(null)
                       resetForm()
                     }}
                     className="px-6 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
@@ -903,10 +940,53 @@ export default function Payroll() {
                     className="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
                     disabled={submitting}
                   >
-                    {submitting ? "Creating..." : "Create Payroll"}
+                    {submitting
+                      ? editingPayroll
+                        ? "Updating..."
+                        : "Creating..."
+                      : editingPayroll
+                        ? "Update Payroll"
+                        : "Create Payroll"}
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteModal && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+            <div className="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
+              <div className="mt-3">
+                <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                  <ExclamationTriangleIcon className="h-6 w-6 text-red-600" />
+                </div>
+                <div className="text-center">
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Delete Payroll</h3>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Are you sure you want to delete the payroll for "{payrollToDelete?.name}"? This action cannot be
+                    undone.
+                  </p>
+                </div>
+                <div className="flex justify-center space-x-3">
+                  <button
+                    onClick={() => {
+                      setShowDeleteModal(false)
+                      setPayrollToDelete(null)
+                    }}
+                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmDelete}
+                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}
